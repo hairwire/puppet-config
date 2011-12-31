@@ -9,7 +9,13 @@ file { "/etc/puppet/puppet.conf":
   require => Package["puppet"];
 }
 
-package { "rails": provider => gem }
+package { "rack":
+  provider => gem;
+}
+package { "rails":
+  provider => gem,
+  require  => Package["rack"];
+}
 
 service { mysqld:
   ensure     => running,
@@ -162,7 +168,7 @@ case $operatingsystem {
       path    => "/usr/sbin:/usr/bin:/bin",
       command => "gem install mysql -- --with-mysql-dir=/usr/mysql --with-mysql-lib=/usr/mysql/lib --with-mysql-include=/usr/mysql/include",
       unless  => "gem list mysql | grep -q ^mysql",
-      require => [ Package["mysql-51/library"], Package[$devel_pkgs] ];
+      require => [ Package[$packages], Package[$devel_pkgs] ];
     }
 
     Service[mysqld] {
