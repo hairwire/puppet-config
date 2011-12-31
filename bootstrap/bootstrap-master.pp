@@ -13,6 +13,9 @@ package { "rack":
   provider => gem;
 }
 package { "rails":
+  # Rails 3.1 broke stored configs in Puppet 2.7.x, so for now the solution is
+  # to install Rails 3.0.x.
+  ensure   => '3.0.11',
   provider => gem,
   require  => Package["rack"];
 }
