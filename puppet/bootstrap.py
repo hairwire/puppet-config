@@ -574,6 +574,7 @@ class PuppetAgent(PuppetCommon):
 
     def bootstrap(self):
         shell('puppet', 'apply', '--verbose',
+              '--modulepath=%s' % dirname(tmpdir),
               join(tmpdir, 'bootstrap-agent.pp'))
 
 class PuppetMaster(PuppetCommon):

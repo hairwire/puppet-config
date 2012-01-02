@@ -1,5 +1,5 @@
-/bootstrap/centos/*.rpm
-/bootstrap/solaris/*.pkg
-/bootstrap/src/*.tar.xz
-/bootstrap/windows/*.exe
+/puppet/files/centos/*.rpm
+/puppet/files/solaris/*.pkg
+/puppet/files/src/*.tar.xz
+/puppet/files/windows/*.exe
 /modules/old/
