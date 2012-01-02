@@ -4,7 +4,7 @@ node default {
   include puppet::agent
 }
 
-node puppet inherits default {  # this is the puppetmaster node
+node puppet {                   # this is the puppetmaster node
   include puppet::master
 }
 

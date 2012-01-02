@@ -1,6 +1,4 @@
 class puppet {
-  package { "puppet": provider => gem }
-  
   user { puppet:
     home     => "/",
     shell    => "/usr/bin/false",

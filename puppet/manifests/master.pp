@@ -1,6 +1,8 @@
 class puppet::master {
   include puppet
 
+  package { "puppet": provider => gem }
+  
   file { "/etc/puppet/puppet.conf":
     owner   => root,
     group   => root,
