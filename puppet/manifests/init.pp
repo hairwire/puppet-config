@@ -52,6 +52,10 @@ class puppet {
       }
     }
   
+    Darwin: {
+      # Do nothing special here
+    }
+  
     default: {
       Service[puppet] {
         require => Package["puppet"]
