@@ -9,6 +9,24 @@ file { "/etc/puppet/puppet.conf":
   require => Package["puppet"];
 }
 
+file { "/etc/puppet/manifests/site.pp":
+  owner   => root,
+  group   => root,
+  mode    => 0755,
+  ensure  => present,
+  source  => "/tmp/puppet/site.pp",
+  require => Package["puppet"];
+}
+
+file { "/etc/puppet/manifests/nodes.pp":
+  owner   => root,
+  group   => root,
+  mode    => 0755,
+  ensure  => present,
+  source  => "/tmp/puppet/nodes.pp",
+  require => Package["puppet"];
+}
+
 package { "rack":
   provider => gem;
 }
