@@ -9,6 +9,15 @@ file { "/etc/puppet/puppet.conf":
   require => Package["puppet"];
 }
 
+file { "/etc/puppet/auth.conf":
+  owner   => root,
+  group   => root,
+  mode    => 0755,
+  ensure  => present,
+  content => template("/tmp/puppet/auth.conf.erb"),
+  require => Package["puppet"];
+}
+
 file { "/etc/puppet/manifests/site.pp":
   owner   => root,
   group   => root,
@@ -50,7 +59,7 @@ define mysql_database($user, $passwd, $host = "localhost") {
     user    => root,
     path    => "/usr/sbin:/usr/bin:/bin",
     command => "sleep 30; mysql mysql -e \"CREATE USER $user@$host IDENTIFIED BY '$passwd';\"",
-    unless  => "mysql mysql -e \"SELECT user FROM user WHERE user='$user'\" | grep -q $user",
+    unless  => "mysql mysql -e \"SELECT user FROM user WHERE user='$user'\" | grep $user",
     require => Service[mysqld];
   }
 
@@ -58,7 +67,7 @@ define mysql_database($user, $passwd, $host = "localhost") {
     user    => root,
     path    => "/usr/sbin:/usr/bin:/bin",
     command => "mysql -e 'CREATE DATABASE $title'",
-    unless  => "mysql -e 'SHOW DATABASES' | grep -q $title",
+    unless  => "mysql -e 'SHOW DATABASES' | grep $title",
     require => Exec["create MySQL user $user"];
   }
 
@@ -152,7 +161,7 @@ case $operatingsystem {
       user    => root,
       path    => "/usr/sbin:/usr/bin:/bin",
       command => "svccfg import /etc/svc/profile/puppetmaster.xml",
-      unless  => "svccfg list network/puppetmaster | grep -q network/puppetmaster",
+      unless  => "svccfg list network/puppetmaster | grep network/puppetmaster",
       require => File["/etc/svc/profile/puppetmaster.xml"];
     }
 
@@ -162,7 +171,7 @@ case $operatingsystem {
                    Exec["install puppetmaster.xml manifest"] ]
     }
 
-    $devel_pkgs = [ 'gcc-dev'
+    $devel_pkgs = [ 'developer/gcc-3'
                   , 'library/math/header-math'
                   ]
     
@@ -188,7 +197,7 @@ case $operatingsystem {
       user    => root,
       path    => "/usr/sbin:/usr/bin:/bin",
       command => "gem install mysql -- --with-mysql-dir=/usr/mysql --with-mysql-lib=/usr/mysql/lib --with-mysql-include=/usr/mysql/include",
-      unless  => "gem list mysql | grep -q ^mysql",
+      unless  => "gem list mysql | grep ^mysql",
       require => [ Package[$packages], Package[$devel_pkgs] ];
     }
 
