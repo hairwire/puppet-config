@@ -4,13 +4,21 @@ class puppet {
     shell    => "/usr/bin/false",
     ensure   => present;
   }
-  
-  service { puppet:
-    ensure     => running,
-    enable     => true,
-    hasstatus  => true,
-    hasrestart => true,
-    subscribe  => File["/etc/puppet/puppet.conf"];
+
+  case $operatingsystem {
+    Darwin: {
+      # Do nothing special here
+    }
+
+    default: {
+      service { puppet:
+        ensure     => running,
+        enable     => true,
+        hasstatus  => true,
+        hasrestart => true,
+        subscribe  => File["/etc/puppet/puppet.conf"];
+      }
+    }
   }
   
   case $operatingsystem {
