@@ -1,4 +1,5 @@
 /modules/old/
 /bootstrap/centos/*.rpm
 /bootstrap/solaris/*.pkg
+/bootstrap/windows/*.exe
 /bootstrap/src/*.tar.xz
