@@ -60,7 +60,6 @@ class puppet::master {
   define mysql_database($user, $passwd, $host = "localhost") {
     exec { "create MySQL user $user":
       user    => root,
-      path    => "/usr/sbin:/usr/bin:/bin",
       command => "sleep 30; mysql mysql -e \"CREATE USER $user@$host IDENTIFIED BY '$passwd';\"",
       unless  => "mysql mysql -e \"SELECT user FROM user WHERE user='$user'\" | grep $user",
       require => Service[mysqld];
@@ -68,7 +67,6 @@ class puppet::master {
   
     exec { "create MySQL database $title":
       user    => root,
-      path    => "/usr/sbin:/usr/bin:/bin",
       command => "mysql -e 'CREATE DATABASE $title'",
       unless  => "mysql -e 'SHOW DATABASES' | grep $title",
       require => Exec["create MySQL user $user"];
@@ -76,7 +74,6 @@ class puppet::master {
   
     exec { "grant MySQL user $user":
       user        => root,
-      path        => "/usr/sbin:/usr/bin:/bin",
       command     => "mysql -e \"GRANT ALL PRIVILEGES ON $title.* TO $user@$host IDENTIFIED BY '$passwd'\"",
       refreshonly => true,
       subscribe   => Exec["create MySQL database $title"],
@@ -162,7 +159,6 @@ class puppet::master {
   
       exec { "install puppetmaster.xml manifest":
         user    => root,
-        path    => "/usr/sbin:/usr/bin:/bin",
         command => "svccfg import /etc/svc/profile/puppetmaster.xml",
         unless  => "svccfg list network/puppetmaster | grep network/puppetmaster",
         require => File["/etc/svc/profile/puppetmaster.xml"];
@@ -198,7 +194,6 @@ class puppet::master {
   
       exec { "manually install mysql gem":
         user    => root,
-        path    => "/usr/sbin:/usr/bin:/bin",
         command => "gem install mysql -- --with-mysql-dir=/usr/mysql --with-mysql-lib=/usr/mysql/lib --with-mysql-include=/usr/mysql/include",
         unless  => "gem list mysql | grep ^mysql",
         require => [ Package[$packages], Package[$devel_pkgs] ];

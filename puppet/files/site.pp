@@ -13,6 +13,6 @@ filebucket { main:
 
 File { backup => main }
 
-#Exec { path => "/usr/bin:/usr/sbin/:/bin:/sbin" }
+Exec { path => "/usr/sbin:/usr/bin/:/sbin:/bin" }
 
 # site.pp ends here
