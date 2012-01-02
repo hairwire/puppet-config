@@ -1,16 +1,16 @@
 class puppet {
-  user { puppet:
-    home     => "/",
-    shell    => "/usr/bin/false",
-    ensure   => present;
-  }
-
   case $operatingsystem {
     Darwin: {
       # Do nothing special here
     }
 
     default: {
+      user { puppet:
+        home     => "/",
+        shell    => "/usr/bin/false",
+        ensure   => present;
+      }
+
       service { puppet:
         ensure     => running,
         enable     => true,
