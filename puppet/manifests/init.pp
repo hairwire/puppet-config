@@ -4,6 +4,10 @@ class puppet {
       # Do nothing special here
     }
 
+    windows: {
+      # Do nothing special here
+    }
+
     default: {
       user { puppet:
         home     => "/",
@@ -61,6 +65,10 @@ class puppet {
     }
   
     Darwin: {
+      # Do nothing special here
+    }
+  
+    windows: {
       # Do nothing special here
     }
   

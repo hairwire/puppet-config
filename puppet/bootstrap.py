@@ -339,11 +339,11 @@ class Machine_CentOS(Machine):
             self.arch = 'i386'
 
         self.ruby_rpm     = \
-            join(tmpdir, 'centos',
+            join(tmpdir, 'files', 'centos',
                  'ruby-enterprise-%s-%s.%s.%s.rpm' %
                  (ruby_version, ruby_rev, self.dist, self.arch))
         self.rubygems_rpm = \
-            join(tmpdir, 'centos',
+            join(tmpdir, 'files', 'centos',
                  'ruby-enterprise-rubygems-%s-%s.%s.%s.rpm' %
                  (rubygems_version, ruby_rev, self.dist, self.arch))
 
@@ -426,7 +426,7 @@ class Machine_CentOS(Machine):
                 if not isdir(specs):   os.makedirs(specs)
                 if not isdir(sources): os.makedirs(sources)
 
-                shutil.copy(ruby_tarball, sources)
+                shutil.copy(join(tmpdir, 'files', 'src', ruby_tarball), sources)
                 shutil.copy('ruby-enterprise.spec', specs)
                 shell('rpmbuild', '-bb',
                       '--define', 'dist .' + self.dist,
@@ -575,7 +575,7 @@ class PuppetAgent(PuppetCommon):
     def bootstrap(self):
         shell('puppet', 'apply', '--verbose',
               '--modulepath=%s' % dirname(tmpdir),
-              join(tmpdir, 'bootstrap-agent.pp'))
+              '-e', 'include puppet::agent')
 
 class PuppetMaster(PuppetCommon):
     def __init__(self, machine):
@@ -589,7 +589,8 @@ class PuppetMaster(PuppetCommon):
 
     def bootstrap(self):
         shell('puppet', 'apply', '--verbose',
-              join(tmpdir, 'bootstrap-master.pp'))
+              '--modulepath=%s' % dirname(tmpdir),
+              '-e', 'include puppet::master')
 
 #############################################################################
 
@@ -643,8 +644,8 @@ class PuppetBootstrap(CommandLineApp):
             if ostype == 'centos':
                 shell('ssh', host, 'yum', 'install', '-y', 'rsync')
 
-            shell('rsync', '-av', '--include=/%s/' % ostype, '--exclude=/*/',
-                  './', '%s:%s/' % (host, tmpdir))
+            shell('rsync', '-av', '--include=/files/%s/' % ostype,
+                  '--exclude=/files/*/', './', '%s:%s/' % (host, tmpdir))
             shell('ssh', host, 'chmod', 'ugo+rX', tmpdir)
 
             if len(args) > 2:

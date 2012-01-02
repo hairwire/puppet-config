@@ -8,6 +8,10 @@ class puppet::agent {
       # Do nothing special here
     }
   
+    windows: {
+      # Do nothing special here
+    }
+  
     default: {
       file { "/etc/puppet/puppet.conf":
         owner   => root,
