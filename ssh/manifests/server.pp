@@ -14,7 +14,7 @@ class ssh::server inherits ssh
       $sshd_config  = "/etc/ssh/sshd_config"
       $ssh_packages = [ "network/ssh"
                       , "network/ssh/ssh-key"
-                      , "service/network/ssh",
+                      , "service/network/ssh"
                       , "SUNWuiu8" ]
 
       # On some Solaris systems, the following is necessary to allow root
