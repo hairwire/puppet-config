@@ -39,9 +39,7 @@ class puppet::master {
     require => Package["puppet"];
   }
   
-  package { "rack":
-    provider => gem;
-  }
+  package { "rack": provider => gem }
   package { "rails":
     # Rails 3.1 broke stored configs in Puppet 2.7.x, so for now the solution is
     # to install Rails 3.0.x.
@@ -174,11 +172,11 @@ class puppet::master {
                      Exec["install puppetmaster.xml manifest"] ]
       }
   
-      $devel_pkgs = [ 'build/gnu-make'
-                    , 'file/gnu-coreutils'
-                    , 'developer/gcc-3'
-                    , 'developer/gnu-binutils'
-                    , 'library/math/header-math' ]
+      $devel_pkgs = [ 'pkg:/file/gnu-coreutils'
+                    , 'pkg:/developer/build/gnu-make'
+                    , 'pkg:/developer/gcc-3'
+                    , 'pkg:/developer/gnu-binutils'
+                    , 'pkg:/system/library/math/header-math' ]
       
       package { $devel_pkgs:
         provider => pkg,

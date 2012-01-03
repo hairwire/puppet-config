@@ -12,10 +12,12 @@ class ssh::server inherits ssh
     Solaris: {
       $ssh_service  = "network/ssh"
       $sshd_config  = "/etc/ssh/sshd_config"
-      $ssh_packages = [ "network/ssh"
-                      , "network/ssh/ssh-key"
-                      , "service/network/ssh"
-                      , "SUNWuiu8" ]
+      $ssh_packages = [ "pkg:/network/ssh"
+                      , "pkg:/network/ssh/ssh-key"
+                      , "pkg:/service/network/ssh"
+                      , "pkg:/system/library/iconv/utf-8" ]
+
+      Package[$ssh_packages] { provider => pkg }
 
       # On some Solaris systems, the following is necessary to allow root
       # logins:
