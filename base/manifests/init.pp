@@ -62,18 +62,3 @@ define interface($mac = $macaddress_eth0, $address = $ipaddress_eth0,
     notify  => Service[network];
   }
 }
-
-define tcpwrapper($allow = "", $deny = "")
-{
-  if $allow {
-    exec { "tcpwrapper-allow-$title":
-      command => "/bin/echo '$title : $allow' >> /etc/hosts.allow",
-      unless  => "/bin/grep -q ^'$title : $allow' /etc/hosts.allow";
-    }
-  } else {
-    exec { "tcpwrapper-deny-$title":
-      command => "/bin/echo '$title : $deny' >> /etc/hosts.deny",
-      unless  => "/bin/grep -q ^'$title : $allow' /etc/hosts.deny";
-    }
-  }
-}
