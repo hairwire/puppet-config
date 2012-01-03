@@ -15,7 +15,9 @@ class ssh::server inherits ssh
       $ssh_packages = [ "pkg:/network/ssh"
                       , "pkg:/network/ssh/ssh-key"
                       , "pkg:/service/network/ssh"
-                      , "pkg:/system/library/iconv/utf-8" ]
+                      # This fails at the moment on bite.entic.net
+                      #, "pkg:/system/library/iconv/utf-8"
+                      ]
 
       Package[$ssh_packages] { provider => pkg }
 

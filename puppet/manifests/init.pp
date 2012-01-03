@@ -10,9 +10,15 @@ class puppet {
 
     default: {
       user { puppet:
-        home     => "/",
-        shell    => "/usr/bin/false",
-        ensure   => present;
+        home   => "/",
+        shell  => "/usr/bin/false",
+        ensure => present;
+      }
+
+      group { puppet:
+        members => puppet,
+        ensure  => present,
+        require => User[puppet];
       }
 
       service { puppet:
@@ -55,7 +61,7 @@ class puppet {
         path    => "/usr/sbin:/usr/bin/:/sbin:/bin",
         user    => root,
         command => "/usr/sbin/svccfg import /etc/svc/profile/puppet.xml",
-        unless  => "/usr/sbin/svccfg list network/puppet | grep -q network/puppet",
+        unless  => "/usr/sbin/svccfg list network/puppet | grep network/puppet",
         require => File["/etc/svc/profile/puppet.xml"];
       }
   

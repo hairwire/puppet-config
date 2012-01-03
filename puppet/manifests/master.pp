@@ -197,7 +197,7 @@ class puppet::master {
       #}
   
       exec { "manually install mysql gem":
-        path    => "/usr/sbin:/usr/bin/:/sbin:/bin:/usr/gcc/4.3/bin",
+        path    => "/usr/sbin:/usr/bin/:/sbin:/bin",
         user    => root,
         command => "gem install mysql -- --with-mysql-dir=/usr/mysql --with-mysql-lib=/usr/mysql/lib --with-mysql-include=/usr/mysql/include",
         unless  => "gem list mysql | grep ^mysql",
