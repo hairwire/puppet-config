@@ -46,12 +46,10 @@ class ssh::server inherits ssh
   package { $ssh_packages: ensure => latest }
 
   file { "/root/.ssh":
-    owner   => "root",
-    group   => "root",
+    owner   => root,
+    group   => root,
     mode    => 0700,
-    type    => directory,
-    ensure  => directory,
-    require => User[admin];
+    ensure  => directory;
   }
 
   exec { "permit root logins":
