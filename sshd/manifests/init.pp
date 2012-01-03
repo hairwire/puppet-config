@@ -1,5 +1,17 @@
 class sshd
 {
+  # For Solaris:
+  #
+  #  packages network/ssh SUNWuiu8
+  #
+  #  Edit =/etc/ssh/sshd_config=:
+  #  PermitRootLogin without-password
+  #
+  #  Edit =/etc/default/login=, and comment out this line:
+  #  #CONSOLE =/dev/login
+  #
+  #  Execute:
+  #  rolemod -K type=normal root
   case $operatingsystem {
     centos: {
       include centos
@@ -29,24 +41,6 @@ class sshd
     ensure  => present,
     source  => "puppet:///modules/sshd/authorized_keys",
     require => File["/root/.ssh"];
-  }
-
-  file { "/home/admin/.ssh":
-    owner   => "admin",
-    group   => "adm",
-    mode    => 0700,
-    type    => directory,
-    ensure  => directory,
-    require => User[admin];
-  }
-
-  file { "/home/admin/.ssh/authorized_keys":
-    owner   => "admin",
-    group   => "adm",
-    mode    => 0600,
-    ensure  => present,
-    source  => "puppet:///modules/sshd/authorized_keys",
-    require => File["/home/admin/.ssh"];
   }
 
   file { "/etc/ssh/sshd_config":

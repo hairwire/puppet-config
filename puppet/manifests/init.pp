@@ -52,6 +52,7 @@ class puppet {
       }
   
       exec { "install puppet.xml manifest":
+        path    => "/usr/sbin:/usr/bin/:/sbin:/bin",
         user    => root,
         command => "/usr/sbin/svccfg import /etc/svc/profile/puppet.xml",
         unless  => "/usr/sbin/svccfg list network/puppet | grep -q network/puppet",

@@ -59,6 +59,7 @@ class puppet::master {
   
   define mysql_database($user, $passwd, $host = "localhost") {
     exec { "create MySQL user $user":
+      path    => "/usr/sbin:/usr/bin/:/sbin:/bin",
       user    => root,
       command => "sleep 30; mysql mysql -e \"CREATE USER $user@$host IDENTIFIED BY '$passwd';\"",
       unless  => "mysql mysql -e \"SELECT user FROM user WHERE user='$user'\" | grep $user",
@@ -66,6 +67,7 @@ class puppet::master {
     }
   
     exec { "create MySQL database $title":
+      path    => "/usr/sbin:/usr/bin/:/sbin:/bin",
       user    => root,
       command => "mysql -e 'CREATE DATABASE $title'",
       unless  => "mysql -e 'SHOW DATABASES' | grep $title",
@@ -73,6 +75,7 @@ class puppet::master {
     }
   
     exec { "grant MySQL user $user":
+      path        => "/usr/sbin:/usr/bin/:/sbin:/bin",
       user        => root,
       command     => "mysql -e \"GRANT ALL PRIVILEGES ON $title.* TO $user@$host IDENTIFIED BY '$passwd'\"",
       refreshonly => true,
@@ -158,6 +161,7 @@ class puppet::master {
       }
   
       exec { "install puppetmaster.xml manifest":
+        path    => "/usr/sbin:/usr/bin/:/sbin:/bin",
         user    => root,
         command => "svccfg import /etc/svc/profile/puppetmaster.xml",
         unless  => "svccfg list network/puppetmaster | grep network/puppetmaster",
@@ -170,9 +174,11 @@ class puppet::master {
                      Exec["install puppetmaster.xml manifest"] ]
       }
   
-      $devel_pkgs = [ 'developer/gcc-3'
-                    , 'library/math/header-math'
-                    ]
+      $devel_pkgs = [ 'build/gnu-make'
+                    , 'file/gnu-coreutils'
+                    , 'developer/gcc-3'
+                    , 'developer/gnu-binutils'
+                    , 'library/math/header-math' ]
       
       package { $devel_pkgs:
         provider => pkg,
@@ -193,6 +199,7 @@ class puppet::master {
       #}
   
       exec { "manually install mysql gem":
+        path    => "/usr/sbin:/usr/bin/:/sbin:/bin:/usr/gcc/4.3/bin",
         user    => root,
         command => "gem install mysql -- --with-mysql-dir=/usr/mysql --with-mysql-lib=/usr/mysql/lib --with-mysql-include=/usr/mysql/include",
         unless  => "gem list mysql | grep ^mysql",

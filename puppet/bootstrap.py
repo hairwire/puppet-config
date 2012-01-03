@@ -457,10 +457,10 @@ class Machine_OpenIndiana(Machine):
         Machine.__init__(self)
 
         self.perftools_pkg = \
-            join(tmpdir, 'solaris',
+            join(tmpdir, 'files', 'solaris',
                  'google-perftools-%s.pkg' % perftools_version)
         self.ruby_pkg = \
-            join(tmpdir, 'solaris',
+            join(tmpdir, 'files', 'solaris',
                  'ruby-enterprise-%s-%s.pkg' % (ruby_version, ruby_date))
 
     def install(self, *pkgs):
@@ -529,7 +529,8 @@ basedir=default
             self.install_pkg(self.ruby_pkg)
 
     def install_git(self):
-        self.install_pkg(join(tmpdir, 'solaris', 'git-%s.pkg' % git_version))
+        self.install_pkg(join(tmpdir, 'files', 'solaris', 'git-%s.pkg' %
+                              git_version))
 
     def start_service(self, name):
         shell('svcadm', 'enable', name)
@@ -624,6 +625,11 @@ class PuppetBootstrap(CommandLineApp):
                 shutil.rmtree('/etc/puppet/ssl')
                 machine.start_service('puppetmaster')
 
+            if not master and not isdir('/etc/puppet/modules'):
+                host.install_git()
+                shell('git', 'clone', 'git://github.com/jwiegley/puppet-config',
+                      '/etc/puppet/modules')
+
             time.sleep(60)
             try: shell('puppetd', '--test')
             except: pass
@@ -643,6 +649,12 @@ class PuppetBootstrap(CommandLineApp):
 
             if ostype == 'centos':
                 shell('ssh', host, 'yum', 'install', '-y', 'rsync')
+            elif ostype == 'solaris':
+                for pkg in [ 'rsync', 'package/svr4', 'gcc-libstdc' ]:
+                    shell('ssh', host, '/bin/sh', '-c',
+                          '"pkg list -H %s || pkg install %s"' % (pkg, pkg))
+                shell('ssh', host, '/bin/sh', '-c',
+                      '"test -d /var/lib || mkdir /var/lib"')
 
             shell('rsync', '-av', '--include=/files/%s/' % ostype,
                   '--exclude=/files/*/', './', '%s:%s/' % (host, tmpdir))
