@@ -1,0 +1,3 @@
+#!/bin/sh
+ip link set $IFNAME address $MAC mtu $MTU up
+ip route add <%= network %> dev $IFNAME
