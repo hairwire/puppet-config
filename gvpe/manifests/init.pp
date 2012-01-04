@@ -9,6 +9,8 @@ class gvpe::node(
   , $ifname = "vpn0"
   , $network = "10.0.0.0/16")
 {
+  $etc = "/etc/gvpe"
+
   package { gvpe: ensure => latest }
 
   #
@@ -26,8 +28,6 @@ class gvpe::node(
   #
   # Create the gvpe.conf file, by assembling data collected from all nodes
   #
-
-  $etc = "/etc/gvpe"
 
   @@file { "$etc/nodes.d/$name.conf":
     owner   => root,
