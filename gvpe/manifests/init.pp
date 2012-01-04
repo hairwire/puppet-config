@@ -117,7 +117,8 @@ class gvpe::node(
   }
 
   File <<| tag == "gvpe_node_pubkey" |>> {
-    notify => Service[gvpe];
+    notify  => Service[gvpe],
+    require => File["$etc/pubkeys"];
   }
 
   #
