@@ -79,15 +79,15 @@ class gvpe::node(
     require => Exec["generate hostkey for $title"];
   }
 
+  #
+  # Create the node's public key
+  #
+
   exec { "generate pubkey for $title":
     command => "openssl rsa -in $etc/hostkey -pubout -out $etc/pubkey",
     unless  => "test -f $etc/pubkey",
     require => File["$etc/hostkey"];
   }
-
-  #
-  # Create the node's public key
-  #
 
   file { "$etc/pubkey":
     owner   => root,
@@ -96,16 +96,16 @@ class gvpe::node(
     require => Exec["generate pubkey for $title"];
   }
 
+  #
+  # Distribute the node's public key to all other nodes
+  #
+
   file { "$etc/pubkeys":
     owner   => root,
     mode    => 0700,
     ensure  => directory,
     require => Package[gvpe];
   }
-
-  #
-  # Distribute the node's public key to all other nodes
-  #
 
   @@file { "$etc/pubkeys/$name":
     owner   => root,
