@@ -1,13 +1,17 @@
 # /etc/puppet/manifests/nodes.pp
 
 node default {
-  include puppet::agent
   include ssh::server
+
+  package { 'ntp': ensure => 'present' }
 }
 
-node puppet {                   # this is the puppetmaster node
+node slave inherits default {
+  include puppet::agent
+}
+
+node puppet inherits default {  # this is the puppetmaster node
   include puppet::master
-  include ssh::server
 }
 
 import '/etc/puppet/site/modules/nodes.pp'

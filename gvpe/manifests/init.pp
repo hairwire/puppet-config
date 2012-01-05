@@ -33,7 +33,7 @@ class gvpe::node(
     owner   => root,
     mode    => 0600,
     ensure  => present,
-    content => template("gvpe/gvpe.conf.node.erb");
+    content => template("gvpe/gvpe.conf.node.erb"),
     tag     => gvpe_node_conf;
   }
 
@@ -54,12 +54,12 @@ class gvpe::node(
 
   exec { "assemble gvpe.conf for $title":
     command => "cat $etc/gvpe.conf.pre $etc/nodes.d/* > $etc/gvpe.conf",
-    onlyif  => "expr `find $etc/nodes.d -newer $etc/gvpe.conf -type f -print | wc -l` \> 0",
+    onlyif  => "expr `find $etc/nodes.d -newer $etc/gvpe.conf -type f -print | wc -l` \\> 0",
     require => [ File["$etc/nodes.d"], File["$etc/gvpe.conf.pre"] ];
   }
 
   File <<| tag == "gvpe_node_conf" |>> {
-    notify => [ Exec["assemble gvpe.conf for $title"], Service[gvpe] ];
+    notify => [ Exec["assemble gvpe.conf for $title"], Service[gvpe] ]
   }
 
   #
@@ -118,7 +118,7 @@ class gvpe::node(
 
   File <<| tag == "gvpe_node_pubkey" |>> {
     notify  => Service[gvpe],
-    require => File["$etc/pubkeys"];
+    require => File["$etc/pubkeys"]
   }
 
   #

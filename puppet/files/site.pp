@@ -13,6 +13,12 @@ filebucket { main:
 
 File { backup => main }
 
+case $operatingsystem {
+  Solaris: {
+    Package { provider => pkg }
+  }
+}
+
 Exec { path => "/usr/sbin:/usr/bin/:/sbin:/bin" }
 
 # site.pp ends here
