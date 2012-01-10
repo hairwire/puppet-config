@@ -6,7 +6,7 @@ class gvpe::node(
     $name
   , $port = 50000
   , $mtu = 1400
-  , $ifname = "vpn0"
+  , $ifname = "vpe0"
   , $network = "10.0.0.0/16")
 {
   $etc = "/etc/gvpe"
