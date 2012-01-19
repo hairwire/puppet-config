@@ -19,7 +19,7 @@
     ssldir = $confdir/ssl
 
 [agent]
-    server = puppet
+    server = <%= puppetmaster %>
 
     # The file in which puppetd stores a list of the classes
     # associated with the retrieved configuratiion.  Can be loaded in
@@ -34,9 +34,26 @@
     localconfig = $vardir/localconfig
 
 [master]
-    environments = production, development, testing, bootstrap
+    modulepath = $confdir/environments/$environment/modules:$confdir/modules:$confdir/site/modules
+    environments = production, development, testing
     server = puppet
-    certname = puppet
+    certname = <%= puppetmaster %>
+    storeconfigs = true
+    dbadapter = mysql
+    dbuser = puppet
+    dbpassword = puppet
+    dbname = puppet
+    dbserver = 127.0.0.1
+    dbsocket = /var/lib/mysql/mysql.sock
 
 [main]
     environment = production
+
+[production]
+    manifest = $confdir/manifests/site.pp
+
+[testing]
+    manifest = $confdir/manifests/site.pp
+
+[development]
+    manifest = $confdir/manifests/site.pp

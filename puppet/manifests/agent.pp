@@ -18,7 +18,7 @@ class puppet::agent {
         group   => root,
         mode    => 0755,
         ensure  => present,
-        source  => "puppet:///modules/puppet/puppet-agent.conf",
+        source  => template("puppet/puppet.conf.erb"),
         require => Package["puppet"];
       }
     }

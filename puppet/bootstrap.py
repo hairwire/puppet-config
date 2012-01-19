@@ -1,19 +1,24 @@
 #!/usr/bin/env python
 
-# jww (2011-07-04): Have remote git clone a puppet repo to start the server
-
 tmpdir = '/tmp/puppet'
 
 # Ruby details
 
-ruby_version      = "1.8.7"
-ruby_rev          = "7"
-ruby_date         = "2011.03"
-rubygems_version  = "1.5.2"
-ruby_tarball      = 'ruby-enterprise-%s-%s.tar.gz' % (ruby_version, ruby_date)
+use_ruby19 = True
 
-perftools_version = "1.7"
-git_version       = "1.7.6"
+if use_ruby19:
+    ruby_version      = "1.9.3"
+    ruby_rev          = "p0"
+    ruby_tarball      = 'ruby-%s-%s.tar.gz' % (ruby_version, ruby_rev)
+else:
+    ruby_version      = "1.8.7"
+    ruby_rev          = "7"
+    ruby_date         = "2011.03"
+    rubygems_version  = "1.5.2"
+    ruby_tarball      = 'ruby-enterprise-%s-%s.tar.gz' % (ruby_version, ruby_date)
+    perftools_version = "1.7"
+
+git_version = "1.7.6"
 
 ##############################################################################
 #
@@ -297,7 +302,7 @@ class Machine(object):
     def gem_install(self, *pkgs):
         for pkg in pkgs:
             if pkg not in self.gems:
-                shell('gem', 'install', '-r', pkg)
+                shell('gem', 'install', '-r', '--no-rdoc', '--no-ri', pkg)
 
     def installed_gems(self):
         if not self.gems:
@@ -338,14 +343,23 @@ class Machine_CentOS(Machine):
         else:
             self.arch = 'i386'
 
-        self.ruby_rpm     = \
-            join(tmpdir, 'files', 'centos',
-                 'ruby-enterprise-%s-%s.%s.%s.rpm' %
-                 (ruby_version, ruby_rev, self.dist, self.arch))
-        self.rubygems_rpm = \
-            join(tmpdir, 'files', 'centos',
-                 'ruby-enterprise-rubygems-%s-%s.%s.%s.rpm' %
-                 (rubygems_version, ruby_rev, self.dist, self.arch))
+        if use_ruby19:
+            self.libyaml_rpm = \
+                join(tmpdir, 'files', 'centos',
+                     'libyaml-0.1.4-1.%s.rpm' % (self.arch,))
+            self.ruby_rpm     = \
+                join(tmpdir, 'files', 'centos',
+                     'ruby-%s%s-%s.%s.rpm' %
+                     (ruby_version, ruby_rev, '1', self.arch))
+        else:
+            self.ruby_rpm     = \
+                join(tmpdir, 'files', 'centos',
+                     'ruby-enterprise-%s-%s.%s.%s.rpm' %
+                     (ruby_version, ruby_rev, self.dist, self.arch))
+            self.rubygems_rpm = \
+                join(tmpdir, 'files', 'centos',
+                     'ruby-enterprise-rubygems-%s-%s.%s.%s.rpm' %
+                     (rubygems_version, ruby_rev, self.dist, self.arch))
 
     def install(self, *pkgs):
         if self.is_64bit:
@@ -420,7 +434,7 @@ class Machine_CentOS(Machine):
         sources = join(srcdir, 'SOURCES')
         rpms    = join(srcdir, 'RPMS', self.arch)
 
-        if not isfile(self.ruby_rpm):
+        if False and not isfile(self.ruby_rpm):
             rpm = join(rpms, self.ruby_rpm)
             if not isfile(rpm):
                 if not isdir(specs):   os.makedirs(specs)
@@ -434,13 +448,18 @@ class Machine_CentOS(Machine):
 
             if isfile(rpm):
                 shutil.copy(rpm, ".")
-                shutil.copy(join(rpms, self.rubygems_rpm), ".")
+                if False:
+                    shutil.copy(join(rpms, self.rubygems_rpm), ".")
 
         if not isfile(self.ruby_rpm):
             raise Exception("Failed to build the Ruby RPM " + self.ruby_rpm)
 
-        if not self.has_package('ruby-enterprise'):
-            shell('rpm', '-Uvh', self.ruby_rpm, self.rubygems_rpm)
+        if use_ruby19:
+            if not self.has_package('ruby'):
+                shell('rpm', '-Uvh', self.libyaml_rpm, self.ruby_rpm)
+        else:
+            if not self.has_package('ruby-enterprise'):
+                shell('rpm', '-Uvh', self.ruby_rpm, self.rubygems_rpm)
 
     def install_git(self):
         shell('rpm', '-Uvh', 'http://repo.webtatic.com/yum/centos/5/latest.rpm')
@@ -456,12 +475,19 @@ class Machine_OpenIndiana(Machine):
     def __init__(self):
         Machine.__init__(self)
 
-        self.perftools_pkg = \
-            join(tmpdir, 'files', 'solaris',
-                 'google-perftools-%s.pkg' % perftools_version)
-        self.ruby_pkg = \
-            join(tmpdir, 'files', 'solaris',
-                 'ruby-enterprise-%s-%s.pkg' % (ruby_version, ruby_date))
+        if use_ruby19:
+            self.yaml_pkg = \
+                join(tmpdir, 'files', 'solaris', 'yaml-0.1.4.pkg')
+            self.ruby_pkg = \
+                join(tmpdir, 'files', 'solaris',
+                     'ruby-%s-%s.pkg' % (ruby_version, ruby_rev))
+        else:
+            self.perftools_pkg = \
+                join(tmpdir, 'files', 'solaris',
+                     'google-perftools-%s.pkg' % perftools_version)
+            self.ruby_pkg = \
+                join(tmpdir, 'files', 'solaris',
+                     'ruby-enterprise-%s-%s.pkg' % (ruby_version, ruby_date))
 
     def install(self, *pkgs):
         shell('pkg', 'install', *pkgs)
@@ -522,11 +548,17 @@ basedir=default
         time.sleep(60)
 
     def install_ruby(self):
-        if not self.has_package('google-perftools'):
-            try: self.install_pkg(self.perftools_pkg)
-            except: pass
-        if not self.has_package('ruby-enterprise'):
-            self.install_pkg(self.ruby_pkg)
+        if use_ruby19:
+            if not self.has_package('ruby'):
+                self.install_pkg(self.yaml_pkg)
+                self.install_pkg(self.ruby_pkg)
+        else:
+            if not self.has_package('google-perftools'):
+                try: self.install_pkg(self.perftools_pkg)
+                except: pass
+
+            if not self.has_package('ruby-enterprise'):
+                self.install_pkg(self.ruby_pkg)
 
     def install_git(self):
         self.install_pkg(join(tmpdir, 'files', 'solaris', 'git-%s.pkg' %
@@ -648,9 +680,11 @@ class PuppetBootstrap(CommandLineApp):
             ostype = args[1]
 
             if ostype == 'centos':
-                shell('ssh', host, 'yum', 'install', '-y', 'rsync')
+                shell('ssh', host, 'yum', 'install', '-y',
+                      'rsync', 'screen', 'procinfo')
             elif ostype == 'solaris':
-                for pkg in [ 'rsync', 'package/svr4', 'gcc-libstdc' ]:
+                #for pkg in [ 'rsync', 'package/svr4', 'gcc-libstdc' ]:
+                for pkg in [ 'rsync', 'package/svr4' ]:
                     shell('ssh', host, '/bin/sh', '-c',
                           '"pkg list -H %s || pkg install %s"' % (pkg, pkg))
                 shell('ssh', host, '/bin/sh', '-c',

@@ -8,7 +8,7 @@ class puppet::master {
     group   => root,
     mode    => 0755,
     ensure  => present,
-    source  => "puppet:///modules/puppet/puppet-master.conf",
+    source  => template("puppet/puppet.conf.erb"),
     require => Package["puppet"];
   }
   
@@ -147,8 +147,6 @@ class puppet::master {
     }
   
     Solaris: {
-      group { puppet: ensure => present }
-  
       file { "/etc/svc/profile/puppetmaster.xml":
         owner   => root,
         group   => root,
@@ -199,7 +197,7 @@ class puppet::master {
       exec { "manually install mysql gem":
         path    => "/usr/sbin:/usr/bin/:/sbin:/bin",
         user    => root,
-        command => "gem install mysql -- --with-mysql-dir=/usr/mysql --with-mysql-lib=/usr/mysql/lib --with-mysql-include=/usr/mysql/include",
+        command => "gem install -r --no-rdoc --no-ri mysql -- --with-mysql-dir=/usr/mysql --with-mysql-lib=/usr/mysql/lib --with-mysql-include=/usr/mysql/include",
         unless  => "gem list mysql | grep ^mysql",
         require => [ Package[$packages], Package[$devel_pkgs] ];
       }
