@@ -8,7 +8,7 @@ class puppet::master {
     group   => root,
     mode    => 0755,
     ensure  => present,
-    source  => template("puppet/puppet.conf.erb"),
+    content => template("puppet/puppet.conf.erb"),
     require => Package["puppet"];
   }
   
