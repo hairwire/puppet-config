@@ -57,7 +57,8 @@ class ssh::server inherits ssh
   augeas { 'permit public-key root logins':
     context => '/files/etc/ssh/sshd_config',
     # permit root logins only using publickey
-    changes => [ 'set PermitRootLogin without-password' ],
+    changes => 'set PermitRootLogin without-password',
+    onlyif  => 'get PermitRootLogin != without-password',
     notify  => Service['sshd'];
   }
 
