@@ -3,7 +3,14 @@
 node default {
   include ssh::server
 
-  package { 'ntp': ensure => 'present' }
+  package { 'ntp':    ensure => present }
+
+  package { 'augeas': ensure => latest }
+  package { 'ruby-augeas':
+    ensure   => latest,
+    provider => gem,
+    requires => Package[augeas] ;
+  }
 }
 
 node slave inherits default {

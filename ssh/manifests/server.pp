@@ -54,10 +54,11 @@ class ssh::server inherits ssh
     ensure  => directory;
   }
 
-  exec { "permit root logins":
-    user    => root,
-    command => "perl -i -pe 's/^#?PermitRoot.*/PermitRootLogin without-password/;' $sshd_config",
-    unless  => "grep '^PermitRootLogin without-password' $sshd_config";
+  augeas { 'permit public-key root logins':
+    context => '/files/etc/ssh/sshd_config',
+    # permit root logins only using publickey
+    changes => [ 'set PermitRootLogin without-password' ],
+    notify  => Service['sshd'];
   }
 
   service { sshd:

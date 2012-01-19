@@ -587,6 +587,7 @@ class PuppetCommon(object):
     def install_puppet(self):
         if 'puppet' not in self.machine.installed_gems():
             self.machine.gem_install('puppet')
+        self.install_pkg(join(tmpdir, 'files', 'solaris', 'augeas-0.10.0.pkg'))
 
     def install_git(self):
         self.machine.install_git()
