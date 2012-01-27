@@ -5,12 +5,12 @@ node default {
 
   package { 'ntp':    ensure => present }
 
-  package { 'augeas': ensure => latest }
-  package { 'ruby-augeas':
-    ensure   => latest,
-    provider => gem,
-    require  => Package[augeas] ;
-  }
+  #package { 'augeas': ensure => latest }
+  #package { 'ruby-augeas':
+  #  ensure   => latest,
+  #  provider => gem,
+  #  require  => Package[augeas] ;
+  #}
 }
 
 node slave inherits default {
