@@ -54,12 +54,13 @@ class ssh::server inherits ssh
     ensure  => directory;
   }
 
-  augeas { 'permit public-key root logins':
+  augeas { sshd_config:
     context => '/files/etc/ssh/sshd_config',
     # permit root logins only using publickey
     changes => 'set PermitRootLogin without-password',
     onlyif  => 'get PermitRootLogin != without-password',
-    notify  => Service['sshd'];
+    notify  => Service['sshd'],
+    require => Package[$ssh_packages];
   }
 
   service { sshd:
@@ -68,7 +69,7 @@ class ssh::server inherits ssh
     enable     => true,
     hasstatus  => true,
     hasrestart => true,
-    require    => Package[$ssh_packages];
+    require    => Augeas[sshd_config];
   }
 
   tcpwrapper::rule { sshd: allow => "ALL" }

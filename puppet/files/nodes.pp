@@ -9,7 +9,7 @@ node default {
   package { 'ruby-augeas':
     ensure   => latest,
     provider => gem,
-    requires => Package[augeas] ;
+    require  => Package[augeas] ;
   }
 }
 
